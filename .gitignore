@@ -1,0 +1,5 @@
+.env
+resources/
+venv/
+_pycache_/
+icici_DB/
