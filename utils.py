@@ -1,4 +1,5 @@
 import os
+
 from dotenv import load_dotenv
 from langchain.agents import create_agent
 from langchain.tools import tool
@@ -12,6 +13,7 @@ from langchain_community.tools import DuckDuckGoSearchRun
 from langchain_community.document_loaders import TextLoader
 from langchain.messages import AIMessage
 from langsmith import traceable
+from langchain_mcp_adapters.client import MultiServerMCPClient  
 
 load_dotenv()
 API_KEY=os.getenv("GROQ_API_KEY")
@@ -96,15 +98,32 @@ model = ChatGroq(
         api_key=API_KEY,
     )
 
-agent = create_agent(
-    model=model,
-    tools=[rag_tool,web_search_tool],
-    system_prompt=prompt)
 
 
 @traceable(name="icici_support")
-def icici_support(question):
-    result=agent.invoke({'messages': [AIMessage(question)]})
+async def icici_support(question):
+    client = MultiServerMCPClient(
+        {
+            "web_search_tool": {
+            "transport": "http",
+            
+            "url": "https://innately-nondiocesan-daxton.ngrok-free.dev/mcp",
+            },
+            
+            "rag_tools": {
+                "transport": "http",
+                
+                "url": "https://innately-nondiocesan-daxton.ngrok-free.dev/mcp",
+            }
+        }
+    )
+    client_tools = await client.get_tools()
+    agent = create_agent(
+    model=model,
+    tools=client_tools,
+    system_prompt=prompt)
+
+    result=await agent.ainvoke({'messages': [AIMessage(question)]})
     # print("result_",result)
     return result
 
