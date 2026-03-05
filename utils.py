@@ -108,13 +108,13 @@ async def icici_support(question):
             "transport": "http",
             
             "url": "https://innately-nondiocesan-daxton.ngrok-free.dev/mcp",
-            },
-            
-            "rag_tools": {
-                "transport": "http",
-                
-                "url": "https://innately-nondiocesan-daxton.ngrok-free.dev/mcp",
             }
+            
+            # "rag_tools": {
+            #     "transport": "http",
+                
+            #     "url": "https://innately-nondiocesan-daxton.ngrok-free.dev/mcp",
+            # }
         }
     )
     client_tools = await client.get_tools()
